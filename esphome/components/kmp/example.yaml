@@ -1,0 +1,29 @@
+esphome:
+  name: heater-meter
+  platform: ESP8266
+  board: d1_mini
+
+uart:
+  - id: uart_bus
+    rx_pin: D1
+    tx_pin: D2
+    baud_rate: 1200
+    data_bits: 8
+    parity: NONE
+    stop_bits: 1
+
+kmp:
+  uart_id: uart_bus
+  timeout: 200 # optional
+
+sensor:
+  - platform: kmp
+    name: "Multical Energy"
+    register_id: 60
+    id: kmp_energy
+    icon: "mdi:lightning-bolt"
+    unit_of_measurement: MWh
+    accuracy_decimals: 3
+    state_class: total_increasing
+    device_class: energy
+    force_update: true
