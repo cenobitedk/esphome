@@ -9,6 +9,7 @@ class KmpSensor : public KmpSensorBase, public sensor::Sensor, public PollingCom
  public:
   KmpSensor(std::string controller_id, uint16_t register_id);
   void update() override;
+  void loop() override;
   void dump_config() override;
 };
 
