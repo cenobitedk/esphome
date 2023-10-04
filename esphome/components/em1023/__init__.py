@@ -10,7 +10,7 @@ DEPENDENCIES = ["uart"]
 CONF_DECRYPTION_KEY = "decryption_key"
 
 em1023_ns = cg.esphome_ns.namespace("em1023")
-EM1023 = em1023_ns.class_("EM1023", cg.Component, uart.UARTDevice)
+EM1023 = em1023_ns.class_("EM1023Component", cg.Component)
 # MULTI_CONF = True
 
 CONFIG_SCHEMA = cv.All(
