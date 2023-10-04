@@ -40,7 +40,7 @@ struct Transport::Packet {
 
 } __attribute__((__packed__));
 
-Transport::Transport(shared_ptr<uart::UARTComponent> serial) : serial(move(serial)) {
+Transport::Transport(uart::UARTComponent *serial) : serial(move(serial)) {
   transport_mutex = xSemaphoreCreateMutex();
   if (!transport_mutex)
     ESP_LOGE(TAG, "Failed to create transport mutex.");

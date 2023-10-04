@@ -78,7 +78,7 @@ class Transport {
   static constexpr uint8_t ACK = 0x06;
   static constexpr uint8_t NACK = 0x15;
 
-  explicit Transport(std::shared_ptr<uart::UARTComponent> serial);
+  explicit Transport(uart::UARTComponent *serial);
 
   bool request(service::Service &&service);
 
