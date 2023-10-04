@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <cassert>
-#include "identification.h"
+#include "ansic1218_identification.h"
 
 using namespace std;
 using namespace esphome::ansic1218::service;

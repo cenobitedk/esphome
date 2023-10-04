@@ -15,8 +15,8 @@
 #pragma once
 
 // #include "esp_log.h"
-#include "../tables/table.h"
-#include "service.h"
+#include "ansic1218_table.h"
+#include "ansic1218_service.h"
 
 namespace esphome {
 namespace ansic1218 {

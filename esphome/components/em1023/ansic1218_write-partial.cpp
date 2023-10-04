@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <limits>
-#include "write-partial.h"
+#include "ansic1218_write-partial.h"
 
 using namespace std;
 using namespace esphome::ansic1218::service;

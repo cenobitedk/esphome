@@ -14,7 +14,7 @@
 
 #include <algorithm>
 #include <sstream>
-#include "service.h"
+#include "ansic1218_service.h"
 
 using namespace std;
 using namespace esphome::ansic1218::service;

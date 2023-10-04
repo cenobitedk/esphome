@@ -14,30 +14,25 @@
 
 #pragma once
 
-#include "table.h"
+#include "ansic1218_table.h"
 
 namespace esphome {
 namespace ansic1218 {
 namespace table {
 
-class Table55 : public Table {
+class Table01 : public Table {
  public:
   struct Content {
-    uint8_t year;
-    uint8_t month;
-    uint8_t day;
-    uint8_t hour;
-    uint8_t min;
-    uint8_t sec;
-    uint8_t fraq;
-    uint8_t weekDay;
-    uint16_t currentSegment : 3;
-    uint16_t notUsed : 3;
-    uint16_t constValue : 2;
-    uint16_t constValue2 : 8;
+    uint8_t manufacturer[4];
+    uint8_t ed_model[8];
+    uint8_t hw_version_number;
+    uint8_t hw_revision_number;
+    uint8_t fw_version_number;
+    uint8_t fw_revision_number;
+    char mfg_serial_number[16];
   } __attribute__((__packed__));
 
-  Table55() : Table(55) {}
+  Table01() : Table(1) {}
 
   Content *content() { return reinterpret_cast<Content *>(data().data()); };
 };

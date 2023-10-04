@@ -29,9 +29,9 @@
 // #include <string>
 // #include <vector>
 // #include "esp_log.h"
-#include "crc.h"
+#include "ansic1218_crc.h"
 // #include "utils/serial.h"
-#include "services/service.h"
+#include "ansic1218_service.h"
 
 #include "esphome/core/component.h"
 #include "esphome/core/helpers.h"

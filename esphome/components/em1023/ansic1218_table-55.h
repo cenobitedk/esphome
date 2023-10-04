@@ -14,35 +14,33 @@
 
 #pragma once
 
-#include "../tables/table.h"
-#include "service.h"
+#include "ansic1218_table.h"
 
 namespace esphome {
 namespace ansic1218 {
-namespace service {
+namespace table {
 
-class ReadPartial : public Service {
-  typedef struct {
-    uint32_t data : 24;
-  } __attribute__((__packed__)) uint24_t;
-
-  struct Request;
-
-  struct Response;
-
-  static constexpr uint8_t PARTIAL_READ = 0x3F;
-
-  table::Table &table;
-
-  uint24_t offset;
-
+class Table55 : public Table {
  public:
-  explicit ReadPartial(table::Table &table);
+  struct Content {
+    uint8_t year;
+    uint8_t month;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t min;
+    uint8_t sec;
+    uint8_t fraq;
+    uint8_t weekDay;
+    uint16_t currentSegment : 3;
+    uint16_t notUsed : 3;
+    uint16_t constValue : 2;
+    uint16_t constValue2 : 8;
+  } __attribute__((__packed__));
 
-  bool request(std::vector<uint8_t> &buffer) override;
+  Table55() : Table(55) {}
 
-  bool response(std::vector<uint8_t>::const_iterator first, std::vector<uint8_t>::const_iterator last) override;
+  Content *content() { return reinterpret_cast<Content *>(data().data()); };
 };
-}  // namespace service
+}  // namespace table
 }  // namespace ansic1218
 }  // namespace esphome

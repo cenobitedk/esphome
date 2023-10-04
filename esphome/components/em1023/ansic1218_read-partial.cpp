@@ -12,24 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <algorithm>
-#include <iomanip>
-#include <sstream>
-#include "read-full.h"
-#include "../tables/table.h"
+#include <limits>
+#include "ansic1218_read-partial.h"
 
 using namespace std;
 using namespace esphome::ansic1218::service;
 using namespace esphome::ansic1218::table;
 
-static const char *TAG = "ansic1218::services:read-full";
+static const char *TAG = "ansic1218::services:read-partial";
 
-ReadFull::ReadFull(Table &table) : Service(__PRETTY_FUNCTION__ + table.name()), table(table) {}
+struct ReadPartial::Request {
+  uint8_t type;
+  uint16_t tableId;
+  uint24_t offset;
+  uint16_t count;
+} __attribute__((__packed__));
 
-bool ReadFull::request(std::vector<uint8_t> &buffer) {
-  static_assert(sizeof(Request) == 3, "");
+struct ReadPartial::Response {
+  uint8_t nok;
+  uint16_t count;
+  uint8_t data[];
+} __attribute__((__packed__));
 
-  Request request{.type = FULL_READ, .table_id = convert_big_endian(table.id())};
+ReadPartial::ReadPartial(Table &table) : Service(__PRETTY_FUNCTION__), table(table) {}
+
+bool ReadPartial::request(std::vector<uint8_t> &buffer) {
+  static_assert(sizeof(Request) == 8, "");
+
+  if (table.offset() > (numeric_limits<uint32_t>::max() >> 8))
+    return 0;
+
+  Request request{.type = PARTIAL_READ,
+                  .tableId = convert_big_endian(table.id()),
+                  .offset =
+                      {
+                          .data = (convert_big_endian(table.offset()) >> 8),
+                      },
+                  .count = convert_big_endian(table.count())};
 
   auto *ptr = reinterpret_cast<uint8_t *>(&request);
 
@@ -38,7 +57,7 @@ bool ReadFull::request(std::vector<uint8_t> &buffer) {
   return true;
 }
 
-bool ReadFull::response(vector<uint8_t>::const_iterator first, vector<uint8_t>::const_iterator last) {
+bool ReadPartial::response(vector<uint8_t>::const_iterator first, vector<uint8_t>::const_iterator last) {
   if (!Service::validate(first, last))
     return false;
 

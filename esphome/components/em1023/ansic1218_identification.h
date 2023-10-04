@@ -14,39 +14,30 @@
 
 #pragma once
 
-#include "../tables/table.h"
-#include "service.h"
+// #include "esp_log.h"
+#include "esphome/core/log.h"
+#include "ansic1218_service.h"
 
 namespace esphome {
 namespace ansic1218 {
 namespace service {
 
-class ReadFull : public Service {
-  static constexpr uint8_t FULL_READ = 0x30;
-
-  table::Table &table;
-
- protected:
-  struct Request {
-    uint8_t type;
-    uint16_t table_id;
-
-  } __attribute__((__packed__));
-
-  struct Response {
-    uint8_t nok;
-    uint16_t count;
-    uint8_t data[];
-
-  } __attribute__((__packed__));
+class Identification : public Service {
+  std::vector<uint8_t> content;
 
  public:
-  explicit ReadFull(table::Table &);
+  struct Response;
+  struct DeviceIdentity;
+
+  Identification();
 
   bool request(std::vector<uint8_t> &buffer) override;
 
   bool response(std::vector<uint8_t>::const_iterator first, std::vector<uint8_t>::const_iterator last) override;
+
+  std::vector<uint8_t> getDeviceIdentity();
 };
+
 }  // namespace service
 }  // namespace ansic1218
 }  // namespace esphome

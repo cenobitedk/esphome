@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <sstream>
-#include "table.h"
+#include "ansic1218_table.h"
 
 using namespace std;
 using namespace esphome::ansic1218::table;

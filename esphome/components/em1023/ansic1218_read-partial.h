@@ -14,30 +14,35 @@
 
 #pragma once
 
-// #include "esp_log.h"
-#include "esphome/core/log.h"
-#include "service.h"
+#include "ansic1218_table.h"
+#include "ansic1218_service.h"
 
 namespace esphome {
 namespace ansic1218 {
 namespace service {
 
-class Identification : public Service {
-  std::vector<uint8_t> content;
+class ReadPartial : public Service {
+  typedef struct {
+    uint32_t data : 24;
+  } __attribute__((__packed__)) uint24_t;
+
+  struct Request;
+
+  struct Response;
+
+  static constexpr uint8_t PARTIAL_READ = 0x3F;
+
+  table::Table &table;
+
+  uint24_t offset;
 
  public:
-  struct Response;
-  struct DeviceIdentity;
-
-  Identification();
+  explicit ReadPartial(table::Table &table);
 
   bool request(std::vector<uint8_t> &buffer) override;
 
   bool response(std::vector<uint8_t>::const_iterator first, std::vector<uint8_t>::const_iterator last) override;
-
-  std::vector<uint8_t> getDeviceIdentity();
 };
-
 }  // namespace service
 }  // namespace ansic1218
 }  // namespace esphome

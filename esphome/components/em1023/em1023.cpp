@@ -2,11 +2,11 @@
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"
 
-#include "ansic1218/transport.h"
-#include "ansic1218/services/identification.h"
-#include "ansic1218/services/security.h"
-#include "ansic1218/services/read-full.h"
-#include "ansic1218/tables/table-01.h"
+#include "ansic1218_transport.h"
+#include "ansic1218_identification.h"
+#include "ansic1218_security.h"
+#include "ansic1218_read-full.h"
+#include "ansic1218_table-01.h"
 
 using namespace esphome::ansic1218;
 using namespace esphome::ansic1218::service;

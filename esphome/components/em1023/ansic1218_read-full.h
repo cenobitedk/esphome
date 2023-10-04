@@ -14,28 +14,39 @@
 
 #pragma once
 
-#include "table.h"
+#include "ansic1218_table.h"
+#include "ansic1218_service.h"
 
 namespace esphome {
 namespace ansic1218 {
-namespace table {
+namespace service {
 
-class Table01 : public Table {
- public:
-  struct Content {
-    uint8_t manufacturer[4];
-    uint8_t ed_model[8];
-    uint8_t hw_version_number;
-    uint8_t hw_revision_number;
-    uint8_t fw_version_number;
-    uint8_t fw_revision_number;
-    char mfg_serial_number[16];
+class ReadFull : public Service {
+  static constexpr uint8_t FULL_READ = 0x30;
+
+  table::Table &table;
+
+ protected:
+  struct Request {
+    uint8_t type;
+    uint16_t table_id;
+
   } __attribute__((__packed__));
 
-  Table01() : Table(1) {}
+  struct Response {
+    uint8_t nok;
+    uint16_t count;
+    uint8_t data[];
 
-  Content *content() { return reinterpret_cast<Content *>(data().data()); };
+  } __attribute__((__packed__));
+
+ public:
+  explicit ReadFull(table::Table &);
+
+  bool request(std::vector<uint8_t> &buffer) override;
+
+  bool response(std::vector<uint8_t>::const_iterator first, std::vector<uint8_t>::const_iterator last) override;
 };
-}  // namespace table
+}  // namespace service
 }  // namespace ansic1218
 }  // namespace esphome

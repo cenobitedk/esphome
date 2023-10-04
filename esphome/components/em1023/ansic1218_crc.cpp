@@ -14,7 +14,7 @@
 
 #include <algorithm>
 #include <cstdio>
-#include "crc.h"
+#include "ansic1218_crc.h"
 
 using namespace std;
 using namespace esphome::ansic1218;

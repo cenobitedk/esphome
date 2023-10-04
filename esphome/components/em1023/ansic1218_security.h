@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "service.h"
+#include "ansic1218_service.h"
 
 namespace esphome {
 namespace ansic1218 {
