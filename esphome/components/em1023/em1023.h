@@ -1,7 +1,6 @@
 #pragma once
 
 #include "esphome/core/component.h"
-#include "esphome/components/sensor/sensor.h"
 #include "esphome/components/uart/uart.h"
 
 using namespace std;
@@ -9,7 +8,7 @@ using namespace std;
 namespace esphome {
 namespace em1023 {
 
-class EM1023 : public sensor::Sensor, public PollingComponent {
+class EM1023 : public Component, public PollingComponent {
  public:
   EM1023(uart::UARTComponent *uart, char *decryption_key) {
     serial_ = new uart::UARTDevice(uart);

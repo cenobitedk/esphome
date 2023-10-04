@@ -66,7 +66,8 @@ void EM1023::setup() {
 }
 
 void EM1023::dump_config() {
-  LOG_SENSOR("", "EM1023", this);
+  ESP_LOGCONFIG(TAG, "config:");
+  // LOG_SENSOR("", "EM1023", this);
   // LOG_PIN("  DOUT Pin: ", this->dout_pin_);
   // LOG_PIN("  SCK Pin: ", this->sck_pin_);
 
