@@ -8,7 +8,7 @@ using namespace std;
 namespace esphome {
 namespace em1023 {
 
-class EM1023Component : public Component, public PollingComponent {
+class EM1023Component : public PollingComponent {
  public:
   EM1023Component(char *decryption_key) { decryption_key_ = decryption_key; }
 
