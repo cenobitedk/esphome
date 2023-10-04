@@ -8,9 +8,9 @@ using namespace std;
 namespace esphome {
 namespace em1023 {
 
-class EM1023 : public Component, public PollingComponent {
+class EM1023Component : public Component, public PollingComponent {
  public:
-  EM1023(uart::UARTComponent *uart, char *decryption_key) {
+  EM1023Component(uart::UARTComponent *uart, char *decryption_key) {
     serial_ = new uart::UARTDevice(uart);
     decryption_key_ = decryption_key;
   }
@@ -23,7 +23,7 @@ class EM1023 : public Component, public PollingComponent {
 
  private:
   char const *decryption_key_;
-  vector<uint8_t> EM1023::HexToBytes(const char *hex_string);
+  vector<uint8_t> EM1023Component::HexToBytes(const char *hex_string);
 
  protected:
   uart::UARTDevice *serial_;

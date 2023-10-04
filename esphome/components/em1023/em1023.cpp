@@ -17,7 +17,7 @@ namespace em1023 {
 
 static const char *const TAG = "em1023";
 
-void EM1023::setup() {
+void EM1023Component::setup() {
   vector<uint8_t> identity{};
   vector<uint8_t> raw_pass = HexToBytes(this->decryption_key_);
 
@@ -65,7 +65,7 @@ void EM1023::setup() {
   ESP_LOGI(TAG, "setup() done");
 }
 
-void EM1023::dump_config() {
+void EM1023Component::dump_config() {
   ESP_LOGCONFIG(TAG, "config:");
   // LOG_SENSOR("", "EM1023", this);
   // LOG_PIN("  DOUT Pin: ", this->dout_pin_);
@@ -75,8 +75,8 @@ void EM1023::dump_config() {
 
   LOG_UPDATE_INTERVAL(this);
 }
-float EM1023::get_setup_priority() const { return setup_priority::DATA; }
-void EM1023::update() {
+float EM1023Component::get_setup_priority() const { return setup_priority::DATA; }
+void EM1023Component::update() {
   // uint32_t result;
   // if (this->read_sensor_(&result)) {
   //   int32_t value = static_cast<int32_t>(result);
@@ -85,7 +85,7 @@ void EM1023::update() {
   // }
 }
 
-void EM1023::set_decryption_key(const std::string &decryption_key) {
+void EM1023Component::set_decryption_key(const std::string &decryption_key) {
   if (decryption_key.length() == 0) {
     ESP_LOGI(TAG, "Disabling decryption");
     this->decryption_key_ = nullptr;
@@ -112,7 +112,7 @@ void EM1023::set_decryption_key(const std::string &decryption_key) {
   this->decryption_key_ = decryption_key.c_str();
 }
 
-vector<uint8_t> EM1023::HexToBytes(const char *hex_string) {
+vector<uint8_t> EM1023Component::HexToBytes(const char *hex_string) {
   string hex(hex_string);
   vector<uint8_t> bytes;
 
