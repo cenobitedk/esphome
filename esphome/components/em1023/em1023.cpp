@@ -21,7 +21,7 @@ void EM1023Component::setup() {
   vector<uint8_t> identity{};
   vector<uint8_t> raw_pass = HexToBytes(this->decryption_key_);
 
-  auto serial = make_shared<uart::UARTDevice>(this->serial_);
+  auto serial = make_shared<uart::UARTComponent>(this->serial_);
 
   Transport transport(serial);
 

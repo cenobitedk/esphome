@@ -46,7 +46,7 @@ namespace ansic1218 {
 class Transport {
   struct Packet;
 
-  std::shared_ptr<uart::UARTDevice> serial;
+  std::shared_ptr<uart::UARTComponent> serial;
 
   SemaphoreHandle_t transport_mutex;
 
@@ -78,7 +78,7 @@ class Transport {
   static constexpr uint8_t ACK = 0x06;
   static constexpr uint8_t NACK = 0x15;
 
-  explicit Transport(std::shared_ptr<uart::UARTDevice> serial);
+  explicit Transport(std::shared_ptr<uart::UARTComponent> serial);
 
   bool request(service::Service &&service);
 

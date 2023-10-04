@@ -10,10 +10,10 @@ namespace em1023 {
 
 class EM1023Component : public Component, public PollingComponent {
  public:
-  EM1023Component(uart::UARTComponent *uart, char *decryption_key) {
-    serial_ = new uart::UARTDevice(uart);
-    decryption_key_ = decryption_key;
-  }
+  EM1023Component(char *decryption_key) { decryption_key_ = decryption_key; }
+
+  void set_uart_parent(uart::UARTComponent *parent) { this->serial_ = parent; }
+
   void setup() override;
   void dump_config() override;
   float get_setup_priority() const override;
@@ -26,7 +26,7 @@ class EM1023Component : public Component, public PollingComponent {
   vector<uint8_t> HexToBytes(const char *hex_string);
 
  protected:
-  uart::UARTDevice *serial_;
+  uart::UARTComponent *serial_;
 };
 
 }  // namespace em1023
