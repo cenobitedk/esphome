@@ -20,6 +20,7 @@ static const char *const TAG = "em1023";
 void EM1023Component::setup() {}
 
 void EM1023Component::update() {
+  ESP_LOGI(TAG, "Running update()");
   // uint32_t result;
   // if (this->read_sensor_(&result)) {
   //   int32_t value = static_cast<int32_t>(result);
@@ -36,10 +37,10 @@ void EM1023Component::update() {
 
   Identification identification;
 
-  if (!transport.request(identification)) {
-    ESP_LOGE(TAG, "Could not request identity service");
-    return;
-  }
+  // if (!transport.request(identification)) {
+  //   ESP_LOGE(TAG, "Could not request identity service");
+  //   return;
+  // }
 
   // identity = identification.getDeviceIdentity();
 
@@ -65,7 +66,7 @@ void EM1023Component::update() {
   // ESP_LOGI(TAG, "Meter hardware: %s", ohw.str().c_str());
   // ESP_LOGI(TAG, "Meter serial: %s", meter_serial.c_str());
 
-  ESP_LOGI(TAG, "setup() done");
+  ESP_LOGI(TAG, "update() done");
 }
 
 void EM1023Component::dump_config() {
