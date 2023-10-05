@@ -69,7 +69,7 @@ void EM1023Component::dump_config() {
 
   LOG_UPDATE_INTERVAL(this);
 }
-float EM1023Component::get_setup_priority() const { return setup_priority::DATA; }
+float EM1023Component::get_setup_priority() const { return setup_priority::AFTER_CONNECTION; }
 void EM1023Component::update() {
   // uint32_t result;
   // if (this->read_sensor_(&result)) {
