@@ -33,9 +33,9 @@ void EM1023Component::update() {
 
   // // auto serial = make_shared<uart::UARTComponent>(this->serial_);
 
-  Transport transport(this->serial_);
+  // Transport transport(this->serial_);
 
-  Identification identification;
+  // Identification identification;
 
   // if (!transport.request(identification)) {
   //   ESP_LOGE(TAG, "Could not request identity service");
