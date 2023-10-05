@@ -19,7 +19,9 @@ CONFIG_SCHEMA = cv.All(
             cv.GenerateID(): cv.declare_id(EM1023),
             cv.Optional(CONF_DECRYPTION_KEY, default=""): cv.string,
         }
-    ).extend(uart.UART_DEVICE_SCHEMA)
+    )
+    .extend(cv.polling_component_schema("30s"))
+    .extend(uart.UART_DEVICE_SCHEMA)
 )
 
 

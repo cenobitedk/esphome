@@ -17,20 +17,29 @@ namespace em1023 {
 
 static const char *const TAG = "em1023";
 
-void EM1023Component::setup() {
+void EM1023Component::setup() {}
+
+void EM1023Component::update() {
+  // uint32_t result;
+  // if (this->read_sensor_(&result)) {
+  //   int32_t value = static_cast<int32_t>(result);
+  //   ESP_LOGD(TAG, "'%s': Got value %d", this->name_.c_str(), value);
+  //   this->publish_state(value);
+  // }
+
   vector<uint8_t> identity{};
   vector<uint8_t> raw_pass = HexToBytes(this->decryption_key_);
 
   // // auto serial = make_shared<uart::UARTComponent>(this->serial_);
 
-  // Transport transport(this->serial_);
+  Transport transport(this->serial_);
 
-  // Identification identification;
+  Identification identification;
 
-  // if (!transport.request(identification)) {
-  //   ESP_LOGE(TAG, "Could not request identity service");
-  //   return;
-  // }
+  if (!transport.request(identification)) {
+    ESP_LOGE(TAG, "Could not request identity service");
+    return;
+  }
 
   // identity = identification.getDeviceIdentity();
 
@@ -69,15 +78,8 @@ void EM1023Component::dump_config() {
 
   LOG_UPDATE_INTERVAL(this);
 }
-float EM1023Component::get_setup_priority() const { return setup_priority::AFTER_CONNECTION; }
-void EM1023Component::update() {
-  // uint32_t result;
-  // if (this->read_sensor_(&result)) {
-  //   int32_t value = static_cast<int32_t>(result);
-  //   ESP_LOGD(TAG, "'%s': Got value %d", this->name_.c_str(), value);
-  //   this->publish_state(value);
-  // }
-}
+
+float EM1023Component::get_setup_priority() const { return setup_priority::LATE; }
 
 void EM1023Component::set_decryption_key(const std::string &decryption_key) {
   if (decryption_key.length() == 0) {
