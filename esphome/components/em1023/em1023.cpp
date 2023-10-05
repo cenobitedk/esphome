@@ -31,11 +31,11 @@ void EM1023Component::update() {
   vector<uint8_t> identity{};
   vector<uint8_t> raw_pass = HexToBytes(this->decryption_key_);
 
-  ESP_LOGD(TAG, "Key: %s", raw_pass);
+  ESP_LOGD(TAG, "Key: %x", raw_pass);
 
   // // auto serial = make_shared<uart::UARTComponent>(this->serial_);
 
-  // Transport transport(this->serial_);
+  Transport transport(this->serial_);
 
   // Identification identification;
 
