@@ -20,7 +20,7 @@ static const char *const TAG = "em1023";
 void EM1023Component::setup() {}
 
 void EM1023Component::update() {
-  ESP_LOGI(TAG, "Running update()");
+  ESP_LOGI(TAG, "update() start");
   // uint32_t result;
   // if (this->read_sensor_(&result)) {
   //   int32_t value = static_cast<int32_t>(result);
@@ -30,6 +30,8 @@ void EM1023Component::update() {
 
   vector<uint8_t> identity{};
   vector<uint8_t> raw_pass = HexToBytes(this->decryption_key_);
+
+  ESP_LOGD(TAG, "Key: %s", raw_pass);
 
   // // auto serial = make_shared<uart::UARTComponent>(this->serial_);
 
