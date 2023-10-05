@@ -10,10 +10,7 @@ namespace em1023 {
 
 class EM1023Component : public PollingComponent {
  public:
-  EM1023Component(char *decryption_key) { decryption_key_ = decryption_key; }
-
-  void set_uart_parent(uart::UARTComponent *parent) { this->serial_ = parent; }
-
+  EM1023Component(uart::UARTComponent *uart) { this->serial_ = uart; }
   void setup() override;
   void dump_config() override;
   float get_setup_priority() const override;

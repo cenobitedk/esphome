@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import uart
-from esphome.const import CONF_ID
+from esphome.const import CONF_ID, CONF_UART_ID
 
 CODEOWNERS = ["@cenobitedk"]
 
@@ -19,14 +19,14 @@ CONFIG_SCHEMA = cv.All(
             cv.GenerateID(): cv.declare_id(EM1023),
             cv.Optional(CONF_DECRYPTION_KEY, default=""): cv.string,
         }
-    )
-    .extend(cv.polling_component_schema("30s"))
-    .extend(uart.UART_DEVICE_SCHEMA)
+    ).extend(cv.polling_component_schema("30s"))
 )
 
 
 async def to_code(config):
-    # uart_component = await cg.get_variable(config[CONF_UART_ID])
-    var = cg.new_Pvariable(config[CONF_ID], config[CONF_DECRYPTION_KEY])
+    uart_component = await cg.get_variable(config[CONF_UART_ID])
+    var = cg.new_Pvariable(config[CONF_ID], uart_component)
+    if CONF_DECRYPTION_KEY in config:
+        cg.add(var.set_decryption_key(config[CONF_DECRYPTION_KEY]))
     await cg.register_component(var, config)
     await uart.register_uart_device(var, config)
