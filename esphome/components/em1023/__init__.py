@@ -31,4 +31,3 @@ async def to_code(config):
     if CONF_DECRYPTION_KEY in config:
         cg.add(var.set_decryption_key(config[CONF_DECRYPTION_KEY]))
     await cg.register_component(var, config)
-    await uart.register_uart_device(var, config)
