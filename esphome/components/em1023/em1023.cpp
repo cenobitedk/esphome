@@ -21,42 +21,41 @@ void EM1023Component::setup() {
   vector<uint8_t> identity{};
   vector<uint8_t> raw_pass = HexToBytes(this->decryption_key_);
 
-  // auto serial = make_shared<uart::UARTComponent>(this->serial_);
+  // // auto serial = make_shared<uart::UARTComponent>(this->serial_);
 
-  Transport transport(this->serial_);
+  // Transport transport(this->serial_);
 
-  Identification identification;
+  // Identification identification;
 
-  if (!transport.request(identification)) {
-    ESP_LOGE(TAG, "Could not request identity service");
-    return;
-  }
+  // if (!transport.request(identification)) {
+  //   ESP_LOGE(TAG, "Could not request identity service");
+  //   return;
+  // }
 
-  identity = identification.getDeviceIdentity();
+  // identity = identification.getDeviceIdentity();
 
-  if (!transport.request(Security(identity, raw_pass))) {
-    ESP_LOGE(TAG, "could not request security service");
-    return;
-  }
+  // if (!transport.request(Security(identity, raw_pass))) {
+  //   ESP_LOGE(TAG, "could not request security service");
+  //   return;
+  // }
 
-  Table01 table01;
+  // Table01 table01;
 
-  if (!transport.request(ReadFull(table01)))
-    return;
+  // if (!transport.request(ReadFull(table01)))
+  //   return;
 
-  auto info_01 = table01.content();
-  string meter_serial(info_01->mfg_serial_number, sizeof(info_01->mfg_serial_number));
-  ostringstream ofw;
-  ostringstream ohw;
+  // auto info_01 = table01.content();
+  // string meter_serial(info_01->mfg_serial_number, sizeof(info_01->mfg_serial_number));
+  // ostringstream ofw;
+  // ostringstream ohw;
 
-  ofw << (int) info_01->fw_version_number << "." << (int) info_01->fw_revision_number;
-  ohw << (int) info_01->hw_version_number << "." << (int) info_01->hw_revision_number;
+  // ofw << (int) info_01->fw_version_number << "." << (int) info_01->fw_revision_number;
+  // ohw << (int) info_01->hw_version_number << "." << (int) info_01->hw_revision_number;
 
-  ESP_LOGI(TAG, "Meter firmware: %s", ofw.str().c_str());
-  ESP_LOGI(TAG, "Meter hardware: %s", ohw.str().c_str());
-  ESP_LOGI(TAG, "Meter serial: %s", meter_serial.c_str());
+  // ESP_LOGI(TAG, "Meter firmware: %s", ofw.str().c_str());
+  // ESP_LOGI(TAG, "Meter hardware: %s", ohw.str().c_str());
+  // ESP_LOGI(TAG, "Meter serial: %s", meter_serial.c_str());
 
-  // cout << "app_main done" << endl;
   ESP_LOGI(TAG, "setup() done");
 }
 
