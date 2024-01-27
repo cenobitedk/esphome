@@ -34,18 +34,18 @@ jobs:
       cache-key: ${{ steps.cache-key.outputs.key }}
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4.1.1
       - name: Generate cache-key
         id: cache-key
         run: echo key="${{ hashFiles('requirements.txt', 'requirements_optional.txt', 'requirements_test.txt') }}" >> $GITHUB_OUTPUT
       - name: Set up Python ${{ env.DEFAULT_PYTHON }}
         id: python
-        uses: actions/setup-python@v4.7.1
+        uses: actions/setup-python@v5.0.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON }}
       - name: Restore Python virtual environment
         id: cache-venv
-        uses: actions/cache@v3.3.2
+        uses: actions/cache@v4.0.0
         with:
           path: venv
           # yamllint disable-line rule:line-length
@@ -66,7 +66,7 @@ jobs:
       - common
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4.1.1
       - name: Restore Python
         uses: ./.github/actions/restore-python
         with:
@@ -87,7 +87,7 @@ jobs:
       - common
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4.1.1
       - name: Restore Python
         uses: ./.github/actions/restore-python
         with:
@@ -108,7 +108,7 @@ jobs:
       - common
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4.1.1
       - name: Restore Python
         uses: ./.github/actions/restore-python
         with:
@@ -129,7 +129,7 @@ jobs:
       - common
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4.1.1
       - name: Restore Python
         uses: ./.github/actions/restore-python
         with:
@@ -150,7 +150,7 @@ jobs:
       - common
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4.1.1
       - name: Restore Python
         uses: ./.github/actions/restore-python
         with:
@@ -166,23 +166,61 @@ jobs:
 
   pytest:
     name: Run pytest
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+        exclude:
+          # Minimize CI resource usage
+          # by only running the Python version
+          # version used for docker images on Windows and macOS
+          - python-version: "3.12"
+            os: windows-latest
+          - python-version: "3.10"
+            os: windows-latest
+          - python-version: "3.9"
+            os: windows-latest
+          - python-version: "3.12"
+            os: macOS-latest
+          - python-version: "3.10"
+            os: macOS-latest
+          - python-version: "3.9"
+            os: macOS-latest
+    runs-on: ${{ matrix.os }}
     needs:
       - common
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4.1.1
       - name: Restore Python
         uses: ./.github/actions/restore-python
         with:
-          python-version: ${{ env.DEFAULT_PYTHON }}
+          python-version: ${{ matrix.python-version }}
           cache-key: ${{ needs.common.outputs.cache-key }}
       - name: Register matcher
         run: echo "::add-matcher::.github/workflows/matchers/pytest.json"
       - name: Run pytest
+        if: matrix.os == 'windows-latest'
+        run: |
+          ./venv/Scripts/activate
+          pytest -vv --cov-report=xml --tb=native tests
+      - name: Run pytest
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'
         run: |
           . venv/bin/activate
-          pytest -vv --tb=native tests
+          pytest -vv --cov-report=xml --tb=native tests
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   clang-format:
     name: Check clang-format
@@ -191,7 +229,7 @@ jobs:
       - common
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4.1.1
       - name: Restore Python
         uses: ./.github/actions/restore-python
         with:
@@ -216,10 +254,33 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4.1.1
       - name: Find all YAML test files
         id: set-matrix
         run: echo "matrix=$(ls tests/test*.yaml | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+
+  validate-tests:
+    name: Validate YAML test ${{ matrix.file }}
+    runs-on: ubuntu-latest
+    needs:
+      - common
+      - compile-tests-list
+    strategy:
+      fail-fast: false
+      matrix:
+        file: ${{ fromJson(needs.compile-tests-list.outputs.matrix) }}
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4.1.1
+      - name: Restore Python
+        uses: ./.github/actions/restore-python
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON }}
+          cache-key: ${{ needs.common.outputs.cache-key }}
+      - name: Run esphome config ${{ matrix.file }}
+        run: |
+          . venv/bin/activate
+          esphome config ${{ matrix.file }}
 
   compile-tests:
     name: Run YAML test ${{ matrix.file }}
@@ -234,6 +295,7 @@ jobs:
       - pytest
       - pyupgrade
       - compile-tests-list
+      - validate-tests
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -241,7 +303,7 @@ jobs:
         file: ${{ fromJson(needs.compile-tests-list.outputs.matrix) }}
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4.1.1
       - name: Restore Python
         uses: ./.github/actions/restore-python
         with:
@@ -296,14 +358,14 @@ jobs:
 
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4.1.1
       - name: Restore Python
         uses: ./.github/actions/restore-python
         with:
           python-version: ${{ env.DEFAULT_PYTHON }}
           cache-key: ${{ needs.common.outputs.cache-key }}
       - name: Cache platformio
-        uses: actions/cache@v3.3.2
+        uses: actions/cache@v4.0.0
         with:
           path: ~/.platformio
           # yamllint disable-line rule:line-length
@@ -330,6 +392,62 @@ jobs:
         # yamllint disable-line rule:line-length
         if: always()
 
+  list-components:
+    runs-on: ubuntu-latest
+    needs:
+      - common
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4.1.1
+        with:
+          # Fetch enough history so `git merge-base refs/remotes/origin/dev HEAD` works.
+          fetch-depth: 500
+      - name: Fetch dev branch
+        run: |
+          git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +refs/heads/dev*:refs/remotes/origin/dev* +refs/tags/dev*:refs/tags/dev*
+          git merge-base refs/remotes/origin/dev HEAD
+      - name: Restore Python
+        uses: ./.github/actions/restore-python
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON }}
+          cache-key: ${{ needs.common.outputs.cache-key }}
+      - name: Find changed components
+        id: set-matrix
+        run: |
+          . venv/bin/activate
+          echo "matrix=$(script/list-components.py --changed | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+
+  test-build-components:
+    name: Component test ${{ matrix.file }}
+    runs-on: ubuntu-latest
+    needs:
+      - common
+      - list-components
+    if: ${{ needs.list-components.outputs.matrix != '[]' && needs.list-components.outputs.matrix != '' }}
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        file: ${{ fromJson(needs.list-components.outputs.matrix) }}
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4.1.1
+      - name: Restore Python
+        uses: ./.github/actions/restore-python
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON }}
+          cache-key: ${{ needs.common.outputs.cache-key }}
+      - name: test_build_components -e config -c ${{ matrix.file }}
+        run: |
+          . venv/bin/activate
+          ./script/test_build_components -e config -c ${{ matrix.file }}
+      - name: test_build_components -e compile -c ${{ matrix.file }}
+        run: |
+          . venv/bin/activate
+          ./script/test_build_components -e compile -c ${{ matrix.file }}
+
   ci-status:
     name: CI Status
     runs-on: ubuntu-latest
@@ -344,6 +462,7 @@ jobs:
       - pyupgrade
       - compile-tests
       - clang-tidy
+      - test-build-components
     if: always()
     steps:
       - name: Success

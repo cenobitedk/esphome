@@ -67,18 +67,13 @@ def validate_pillow_installed(value):
     except ImportError as err:
         raise cv.Invalid(
             "Please install the pillow python package to use this feature. "
-            '(pip install pillow">4.0.0,<10.0.0")'
+            '(pip install "pillow==10.2.0")'
         ) from err
 
-    if version.parse(PIL.__version__) < version.parse("4.0.0"):
+    if version.parse(PIL.__version__) != version.parse("10.2.0"):
         raise cv.Invalid(
-            "Please update your pillow installation to at least 4.0.x. "
-            '(pip install pillow">4.0.0,<10.0.0")'
-        )
-    if version.parse(PIL.__version__) >= version.parse("10.0.0"):
-        raise cv.Invalid(
-            "Please downgrade your pillow installation to below 10.0.0. "
-            '(pip install pillow">4.0.0,<10.0.0")'
+            "Please update your pillow installation to 10.2.0. "
+            '(pip install "pillow==10.2.0")'
         )
 
     return value
@@ -142,11 +137,10 @@ def validate_weight_name(value):
 
 
 def download_gfonts(value):
-    wght = value[CONF_WEIGHT]
-    if value[CONF_ITALIC]:
-        wght = f"1,{wght}"
-    name = f"{value[CONF_FAMILY]}@{value[CONF_WEIGHT]}"
-    url = f"https://fonts.googleapis.com/css2?family={value[CONF_FAMILY]}:wght@{wght}"
+    name = (
+        f"{value[CONF_FAMILY]}:ital,wght@{int(value[CONF_ITALIC])},{value[CONF_WEIGHT]}"
+    )
+    url = f"https://fonts.googleapis.com/css2?family={name}"
 
     path = _compute_gfonts_local_path(value)
     if path.is_file():
@@ -241,7 +235,7 @@ FILE_SCHEMA = cv.Schema(_file_schema)
 
 
 DEFAULT_GLYPHS = (
-    ' !"%()+=,-.:/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz°'
+    ' !"%()+=,-.:/?0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz°'
 )
 CONF_RAW_GLYPH_ID = "raw_glyph_id"
 
