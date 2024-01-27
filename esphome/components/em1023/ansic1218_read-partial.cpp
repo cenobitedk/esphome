@@ -16,8 +16,9 @@
 #include "ansic1218_read-partial.h"
 
 using namespace std;
-using namespace esphome::ansic1218::service;
-using namespace esphome::ansic1218::table;
+using namespace esphome;
+using namespace ansic1218::service;
+using namespace ansic1218::table;
 
 static const char *TAG = "ansic1218::services:read-partial";
 
@@ -48,7 +49,7 @@ bool ReadPartial::request(std::vector<uint8_t> &buffer) {
                       {
                           .data = (convert_big_endian(table.offset()) >> 8),
                       },
-                  .count = convert_big_endian(table.count())};
+                  .count = static_cast<uint16_t>(convert_big_endian(table.count()))};
 
   auto *ptr = reinterpret_cast<uint8_t *>(&request);
 

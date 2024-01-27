@@ -3,7 +3,10 @@
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
 
+#include "ansic1218_transport.h"
+
 using namespace std;
+using namespace ansic1218;
 
 namespace esphome {
 namespace em1023 {

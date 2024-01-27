@@ -8,9 +8,9 @@
 #include "ansic1218_read-full.h"
 #include "ansic1218_table-01.h"
 
-using namespace esphome::ansic1218;
-using namespace esphome::ansic1218::service;
-using namespace esphome::ansic1218::table;
+using namespace ansic1218;
+using namespace ansic1218::service;
+using namespace ansic1218::table;
 
 namespace esphome {
 namespace em1023 {

@@ -17,7 +17,7 @@
 #include "ansic1218_crc.h"
 
 using namespace std;
-using namespace esphome::ansic1218;
+using namespace ansic1218;
 
 uint32_t CRC::table[256] = {
     0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf, 0x8c48, 0x9dc1, 0xaf5a, 0xbed3, 0xca6c, 0xdbe5,

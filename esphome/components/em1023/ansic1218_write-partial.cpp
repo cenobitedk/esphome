@@ -16,8 +16,9 @@
 #include "ansic1218_write-partial.h"
 
 using namespace std;
-using namespace esphome::ansic1218::service;
-using namespace esphome::ansic1218::table;
+using namespace esphome;
+using namespace ansic1218::service;
+using namespace ansic1218::table;
 
 struct WritePartial::Request {
   uint8_t type;
@@ -38,7 +39,7 @@ bool WritePartial::request(std::vector<uint8_t> &buffer) {
                      {
                          .data = (convert_big_endian(table.offset()) >> 8),
                      },
-                 .count = convert_big_endian(table.data().size())};
+                 .count = static_cast<uint16_t>(convert_big_endian(table.data().size()))};
 
   uint8_t chksum = checksum(table.data().begin(), table.data().end());
 

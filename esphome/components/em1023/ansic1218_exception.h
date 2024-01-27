@@ -18,7 +18,6 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace esphome {
 namespace ansic1218 {
 
 class Exception : public std::runtime_error {
@@ -58,4 +57,3 @@ class Exception : public std::runtime_error {
   explicit Exception(Arg &&pretty_function, Args &&...args) : runtime_error(build(pretty_function, args...)) {}
 };
 }  // namespace ansic1218
-}  // namespace esphome

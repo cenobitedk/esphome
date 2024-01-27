@@ -16,7 +16,6 @@
 
 #include "ansic1218_table.h"
 
-namespace esphome {
 namespace ansic1218 {
 namespace table {
 
@@ -43,4 +42,3 @@ class Table55 : public Table {
 };
 }  // namespace table
 }  // namespace ansic1218
-}  // namespace esphome

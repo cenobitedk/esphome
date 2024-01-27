@@ -16,7 +16,7 @@
 #include "ansic1218_table.h"
 
 using namespace std;
-using namespace esphome::ansic1218::table;
+using namespace ansic1218::table;
 
 Table::Table(uint16_t id) : _id(id), _offset(0) {}
 

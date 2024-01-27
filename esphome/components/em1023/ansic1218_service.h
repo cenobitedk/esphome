@@ -24,7 +24,6 @@
 // #include "esp_log.h"
 #include "esphome/core/log.h"
 
-namespace esphome {
 namespace ansic1218 {
 namespace service {
 
@@ -53,4 +52,3 @@ class Service {
 
 }  // namespace service
 }  // namespace ansic1218
-}  // namespace esphome

@@ -16,7 +16,8 @@
 #include "ansic1218_identification.h"
 
 using namespace std;
-using namespace esphome::ansic1218::service;
+using namespace esphome;
+using namespace ansic1218::service;
 
 static const char *TAG = "ansic1218::services:identification";
 

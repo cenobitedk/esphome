@@ -18,7 +18,6 @@
 #include "esphome/core/log.h"
 #include "ansic1218_service.h"
 
-namespace esphome {
 namespace ansic1218 {
 namespace service {
 
@@ -40,4 +39,3 @@ class Identification : public Service {
 
 }  // namespace service
 }  // namespace ansic1218
-}  // namespace esphome

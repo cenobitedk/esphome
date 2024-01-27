@@ -15,8 +15,9 @@
 #include "ansic1218_write-full.h"
 
 using namespace std;
-using namespace esphome::ansic1218::service;
-using namespace esphome::ansic1218::table;
+using namespace esphome;
+using namespace ansic1218::service;
+using namespace ansic1218::table;
 
 struct WriteFull::Request {
   uint8_t type;
@@ -27,8 +28,9 @@ struct WriteFull::Request {
 WriteFull::WriteFull(Table &table) : Service(__PRETTY_FUNCTION__), table(table) {}
 
 bool WriteFull::request(std::vector<uint8_t> &buffer) {
-  Request header{
-      .type = FULL_WRITE, .tableId = convert_big_endian(table.id()), .count = convert_big_endian(table.data().size())};
+  Request header{.type = FULL_WRITE,
+                 .tableId = convert_big_endian(table.id()),
+                 .count = static_cast<uint16_t>(convert_big_endian(table.data().size()))};
 
   uint8_t chksum = checksum(table.data().begin(), table.data().end());
 

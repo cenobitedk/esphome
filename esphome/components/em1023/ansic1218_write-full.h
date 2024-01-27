@@ -18,7 +18,6 @@
 #include "ansic1218_table.h"
 #include "ansic1218_service.h"
 
-namespace esphome {
 namespace ansic1218 {
 namespace service {
 
@@ -38,4 +37,3 @@ class WriteFull : public Service {
 };
 }  // namespace service
 }  // namespace ansic1218
-}  // namespace esphome

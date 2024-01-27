@@ -16,7 +16,6 @@
 
 #include "ansic1218_service.h"
 
-namespace esphome {
 namespace ansic1218 {
 namespace service {
 
@@ -37,4 +36,3 @@ class Security : public Service {
 };
 }  // namespace service
 }  // namespace ansic1218
-}  // namespace esphome

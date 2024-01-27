@@ -19,7 +19,6 @@
 #include <vector>
 #include <stdint.h>
 
-namespace esphome {
 namespace ansic1218 {
 namespace table {
 
@@ -57,4 +56,3 @@ class Table {
 };
 }  // namespace table
 }  // namespace ansic1218
-}  // namespace esphome

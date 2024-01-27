@@ -17,7 +17,6 @@
 #include <cstdint>
 #include <vector>
 
-namespace esphome {
 namespace ansic1218 {
 
 class CRC {
@@ -31,4 +30,3 @@ class CRC {
                                          std::vector<uint8_t>::const_iterator last, std::vector<uint8_t> &buffer);
 };
 }  // namespace ansic1218
-}  // namespace esphome

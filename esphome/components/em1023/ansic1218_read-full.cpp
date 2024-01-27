@@ -19,8 +19,9 @@
 #include "ansic1218_table.h"
 
 using namespace std;
-using namespace esphome::ansic1218::service;
-using namespace esphome::ansic1218::table;
+using namespace esphome;
+using namespace ansic1218::service;
+using namespace ansic1218::table;
 
 static const char *TAG = "ansic1218::services:read-full";
 
