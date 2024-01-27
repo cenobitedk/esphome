@@ -17,58 +17,74 @@ namespace em1023 {
 
 static const char *const TAG = "em1023";
 
-void EM1023Component::setup() {}
+void EM1023Component::setup() {
+  // auto serial = make_shared<uart::UARTComponent>(this->serial_);
 
-void EM1023Component::update() {
-  ESP_LOGI(TAG, "update() start");
-  // uint32_t result;
-  // if (this->read_sensor_(&result)) {
-  //   int32_t value = static_cast<int32_t>(result);
-  //   ESP_LOGD(TAG, "'%s': Got value %d", this->name_.c_str(), value);
-  //   this->publish_state(value);
-  // }
+  // Transport transport_(this->serial_);
 
-  vector<uint8_t> identity{};
-  vector<uint8_t> raw_pass = HexToBytes(this->decryption_key_);
+  // Transport *transport_ = new Transport(this->serial_);
+  Transport *transport_ = new Transport(this->uart_ptr_);
+}
 
-  ESP_LOGD(TAG, "Key: %x", raw_pass);
+void EM1023Component::update() { this->trigger_update_ = true; }
 
-  // // auto serial = make_shared<uart::UARTComponent>(this->serial_);
+void EM1023Component::loop() {
+  if (this->trigger_update_) {
+    ESP_LOGI(TAG, "update() start");
+    this->trigger_update_ = false;
 
-  Transport transport(this->serial_);
+    // uint32_t result;
+    // if (this->read_sensor_(&result)) {
+    //   int32_t value = static_cast<int32_t>(result);
+    //   ESP_LOGD(TAG, "'%s': Got value %d", this->name_.c_str(), value);
+    //   this->publish_state(value);
+    // }
 
-  // Identification identification;
+    // vector<uint8_t> identity{};
 
-  // if (!transport.request(identification)) {
-  //   ESP_LOGE(TAG, "Could not request identity service");
-  //   return;
-  // }
+    ESP_LOGD(TAG, "Key: %s", this->decryption_key_);
+    vector<uint8_t> raw_pass = HexToBytes(this->decryption_key_);
 
-  // identity = identification.getDeviceIdentity();
+    ESP_LOGD(TAG, "Key: %s", raw_pass.data());
 
-  // if (!transport.request(Security(identity, raw_pass))) {
-  //   ESP_LOGE(TAG, "could not request security service");
-  //   return;
-  // }
+    // auto serial = make_shared<uart::UARTComponent>(this->serial_);
 
-  // Table01 table01;
+    // Transport transport(this->serial_);
 
-  // if (!transport.request(ReadFull(table01)))
-  //   return;
+    // Identification *identification();
+    Identification *identification = new Identification();
 
-  // auto info_01 = table01.content();
-  // string meter_serial(info_01->mfg_serial_number, sizeof(info_01->mfg_serial_number));
-  // ostringstream ofw;
-  // ostringstream ohw;
+    if (!this->transport_.request(*identification)) {
+      ESP_LOGE(TAG, "Could not request identity service");
+      return;
+    }
 
-  // ofw << (int) info_01->fw_version_number << "." << (int) info_01->fw_revision_number;
-  // ohw << (int) info_01->hw_version_number << "." << (int) info_01->hw_revision_number;
+    // identity = identification.getDeviceIdentity();
 
-  // ESP_LOGI(TAG, "Meter firmware: %s", ofw.str().c_str());
-  // ESP_LOGI(TAG, "Meter hardware: %s", ohw.str().c_str());
-  // ESP_LOGI(TAG, "Meter serial: %s", meter_serial.c_str());
+    // if (!transport.request(Security(identity, raw_pass))) {
+    //   ESP_LOGE(TAG, "could not request security service");
+    //   return;
+    // }
 
-  ESP_LOGI(TAG, "update() done");
+    // Table01 table01;
+
+    // if (!transport.request(ReadFull(table01)))
+    //   return;
+
+    // auto info_01 = table01.content();
+    // string meter_serial(info_01->mfg_serial_number, sizeof(info_01->mfg_serial_number));
+    // ostringstream ofw;
+    // ostringstream ohw;
+
+    // ofw << (int) info_01->fw_version_number << "." << (int) info_01->fw_revision_number;
+    // ohw << (int) info_01->hw_version_number << "." << (int) info_01->hw_revision_number;
+
+    // ESP_LOGI(TAG, "Meter firmware: %s", ofw.str().c_str());
+    // ESP_LOGI(TAG, "Meter hardware: %s", ohw.str().c_str());
+    // ESP_LOGI(TAG, "Meter serial: %s", meter_serial.c_str());
+
+    ESP_LOGI(TAG, "update() done");
+  }
 }
 
 void EM1023Component::dump_config() {
@@ -79,7 +95,7 @@ void EM1023Component::dump_config() {
 
   // this->serial_->check_uart_settings()
 
-  LOG_UPDATE_INTERVAL(this);
+  // LOG_UPDATE_INTERVAL(this);
 }
 
 float EM1023Component::get_setup_priority() const { return setup_priority::LATE; }
@@ -106,7 +122,7 @@ void EM1023Component::set_decryption_key(const std::string &decryption_key) {
 
   ESP_LOGI(TAG, "Decryption key is set");
   // Verbose level prints decryption key
-  ESP_LOGV(TAG, "Using decryption key: %s", decryption_key.c_str());
+  ESP_LOGD(TAG, "Using decryption key: %s", decryption_key.c_str());
 
   this->decryption_key_ = decryption_key.c_str();
 }

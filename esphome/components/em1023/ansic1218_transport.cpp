@@ -19,13 +19,13 @@
 #include <iomanip>
 // #include <endian.h>
 // #include <machine/endian.h>
+#include "esphome/core/log.h"
 #include "ansic1218_transport.h"
 
 using namespace std;
-// using namespace chrono;
-using namespace esphome::ansic1218;
+using namespace esphome;
+using namespace ansic1218;
 using namespace service;
-// using namespace utils;
 
 static const char *TAG = "ansic1218::transport";
 
@@ -40,7 +40,11 @@ struct Transport::Packet {
 
 } __attribute__((__packed__));
 
-Transport::Transport(uart::UARTComponent *serial) : serial(move(serial)) {
+// Transport::Transport(uart::UARTDevice *serial) : serial(move(serial)) {
+Transport::Transport(uart::UARTComponent *uart_ptr) {
+  // Prepare serial.
+  esphome::uart::UARTDevice serial(uart_ptr);
+
   transport_mutex = xSemaphoreCreateMutex();
   if (!transport_mutex)
     ESP_LOGE(TAG, "Failed to create transport mutex.");
@@ -55,18 +59,27 @@ bool Transport::request(service::Service &service) {
     return false;
   }
 
+  ESP_LOGD(TAG, "Creating packet");
+
   Packet packet{.stp = Packet::START_OF_PACKET, .identity = Packet::IDENTITY, .ctrl = 0, .seq_nbr = 0, .length = 0};
 
   const uint8_t MULTI_PACKET = 0b10000000;
   const uint8_t FIRST_PACKET = 0b01000000;
 
-  send({ACK});
+  ESP_LOGD(TAG, "Send {ACK}");
+
+  vector<uint8_t> data{ACK};
+  send(data);
+
+  ESP_LOGD(TAG, "Assertion");
 
   static_assert(sizeof(packet) == 6, "");
 
   auto *ptr = reinterpret_cast<uint8_t *>(&packet);
 
   vector<uint8_t> sent{ptr, &ptr[sizeof(packet)]};
+
+  ESP_LOGD(TAG, "Build request frame");
 
   if (!service.request(sent)) {
     ESP_LOGW(TAG, "Could not properly build request frame");
@@ -77,7 +90,11 @@ bool Transport::request(service::Service &service) {
   auto *p_packet = reinterpret_cast<Packet *>(sent.data());
   p_packet->length = convert_big_endian(sent.size() - sizeof(Packet));
 
+  ESP_LOGD(TAG, "CRC calculate");
+
   CRC::calculate(sent.cbegin(), sent.cend(), sent);
+
+  ESP_LOGD(TAG, "Send request");
   send(sent);
 
   vector<uint8_t> content;
@@ -86,7 +103,10 @@ bool Transport::request(service::Service &service) {
 
   vector<uint8_t> received;
 
+  ESP_LOGD(TAG, "Wait for response");
+
   bool ret = wait(received, {ACK});
+
   while (!ret && max_request < 3) {
     max_request++;
     ESP_LOGD(TAG, "Sending packet again. Requested: %d times", int(max_request));
@@ -97,10 +117,13 @@ bool Transport::request(service::Service &service) {
   }
 
   if (!ret) {
+    ESP_LOGD(TAG, "Got no response ");
     ret = nack(service, sent, received, "ACK not received.");
     xSemaphoreGive(transport_mutex);
     return ret;
   }
+
+  ESP_LOGD(TAG, "Response received, start processing ...");
 
   do {
     received.clear();
@@ -111,7 +134,9 @@ bool Transport::request(service::Service &service) {
       return ret;
     }
 
-    ESP_LOGD(TAG, "Received: %X %d", received.data(), received.size());
+    ESP_LOGD(TAG, "Received:");
+    ESP_LOG_BUFFER_HEX(TAG, received.data(), received.size());
+    // ESP_LOGD(TAG, "Received: %X %d", received.data(), received.size());
     // ESP_LOG_BUFFER_HEX_LEVEL(TAG, received.data(), received.size(), ESP_LOG_DEBUG);
     p_packet = reinterpret_cast<Packet *>(received.data() + received.size() - sizeof(packet));
     if (!validate(p_packet)) {
@@ -154,8 +179,8 @@ bool Transport::request(service::Service &service) {
   return ret;
 }
 
-void Transport::send(const vector<uint8_t> &data) {
-  serial->write_array(data);
+void Transport::send(const vector<uint8_t> data) {
+  serial.write_array(data);
   ESP_LOGD(TAG, "send(): %s .", bufToStr(data.cbegin(), data.cend()).c_str());
 }
 
@@ -192,9 +217,10 @@ int Transport::serialRead(vector<uint8_t> &buffer, size_t size) {
   // convert buffer vector to array
   uint8_t *buffer_array = &buffer[0];
   // read to array
-  serial->read_array(buffer_array, size);
+  serial.read_array(buffer_array, size);
   // get length
-  auto nBytesRead = (sizeof(buffer_array) / sizeof(*buffer_array));
+  // auto nBytesRead = (sizeof(buffer_array) / sizeof(*buffer_array));
+  auto nBytesRead = sizeof(buffer_array);
 
   // insert into vector buffer
   buffer.insert(buffer.begin(), buffer_array, buffer_array + nBytesRead);

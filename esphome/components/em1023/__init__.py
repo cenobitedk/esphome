@@ -4,14 +4,13 @@ from esphome.components import uart
 from esphome.const import CONF_ID, CONF_UART_ID
 
 CODEOWNERS = ["@cenobitedk"]
-
 DEPENDENCIES = ["uart"]
+# MULTI_CONF = True
 
 CONF_DECRYPTION_KEY = "decryption_key"
 
 em1023_ns = cg.esphome_ns.namespace("em1023")
-EM1023 = em1023_ns.class_("EM1023Component", cg.Component)
-# MULTI_CONF = True
+EM1023 = em1023_ns.class_("EM1023Component", cg.PollingComponent, uart.UARTDevice)
 
 CONFIG_SCHEMA = cv.All(
     cv.Schema(
@@ -20,7 +19,8 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_DECRYPTION_KEY, default=""): cv.string,
         }
     )
-    .extend(cv.polling_component_schema("30s"))
+    .extend(cv.COMPONENT_SCHEMA)
+    .extend(cv.polling_component_schema("15s"))
     .extend(uart.UART_DEVICE_SCHEMA)
 )
 

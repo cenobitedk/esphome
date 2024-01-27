@@ -16,11 +16,11 @@
 
 #ifdef USE_ESP32
 
-#include <mutex>
-#include <queue>
+// #include <mutex>
+// #include <queue>
 
-#include <freertos/FreeRTOS.h>
-#include <freertos/semphr.h>
+// #include <freertos/FreeRTOS.h>
+// #include <freertos/semphr.h>
 
 #include <cstdint>
 #include <iostream>
@@ -33,20 +33,23 @@
 // #include "utils/serial.h"
 #include "ansic1218_service.h"
 
-#include "esphome/core/component.h"
-#include "esphome/core/helpers.h"
+// #include "esphome/core/component.h"
+// #include "esphome/core/helpers.h"
+// #include "esphome/core/log.h"
+#include "esphome/core/log.h"
 #include "esphome/components/uart/uart.h"
 
 #ifndef CONFIG_ANSI_TRANSPORT_MUTEX_BLOCKTIME
 #define CONFIG_ANSI_TRANSPORT_MUTEX_BLOCKTIME 1000
 #endif
 
-namespace esphome {
 namespace ansic1218 {
 class Transport {
   struct Packet;
 
-  std::shared_ptr<uart::UARTComponent> serial;
+  // std::shared_ptr<esphome::uart::UARTDevice> serial;
+  // esphome::uart::UARTDevice *serial;
+  esphome::uart::UARTDevice serial;
 
   SemaphoreHandle_t transport_mutex;
 
@@ -54,7 +57,7 @@ class Transport {
 
   int serialRead(std::vector<uint8_t> &buffer, size_t size);
 
-  void send(const std::vector<uint8_t> &data);
+  void send(const std::vector<uint8_t> data);
 
   bool wait(std::vector<uint8_t> &buffer, const std::vector<uint8_t> &data);
 
@@ -68,7 +71,7 @@ class Transport {
     std::ostringstream ss;
     using List = int[];
     (void) List{0, ((void) (ss << args), 0)...};
-    ESP_LOGI("ansic1218::transport", "%s %s", service.name().c_str(), ss.str().c_str());
+    // ESP_LOGI("ansic1218::transport", "%s %s", service.name().c_str(), ss.str().c_str());
     return nack(sent, received);
   };
 
@@ -78,7 +81,8 @@ class Transport {
   static constexpr uint8_t ACK = 0x06;
   static constexpr uint8_t NACK = 0x15;
 
-  explicit Transport(uart::UARTComponent *serial);
+  // explicit Transport(esphome::uart::UARTDevice *serial);
+  explicit Transport(esphome::uart::UARTComponent *uart_ptr);
 
   bool request(service::Service &&service);
 
@@ -87,6 +91,5 @@ class Transport {
   bool validate(Packet *packet);
 };
 }  // namespace ansic1218
-}  // namespace esphome
 
 #endif

@@ -29,6 +29,7 @@ class Identification : public Service {
   struct DeviceIdentity;
 
   Identification();
+  virtual ~Identification() = default;
 
   bool request(std::vector<uint8_t> &buffer) override;
 
