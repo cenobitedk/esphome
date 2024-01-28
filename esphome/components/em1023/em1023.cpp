@@ -20,10 +20,9 @@ static const char *const TAG = "em1023";
 void EM1023Component::setup() {
   // auto serial = make_shared<uart::UARTComponent>(this->serial_);
 
-  // Transport transport_(this->serial_);
+  // Transport transport_(this);
 
-  // Transport *transport_ = new Transport(this->serial_);
-  Transport *transport_ = new Transport(this->uart_ptr_);
+  Transport *transport_ = new Transport(this);
 }
 
 void EM1023Component::update() { this->trigger_update_ = true; }
@@ -41,11 +40,6 @@ void EM1023Component::loop() {
     // }
 
     // vector<uint8_t> identity{};
-
-    ESP_LOGD(TAG, "Key: %s", this->decryption_key_);
-    vector<uint8_t> raw_pass = HexToBytes(this->decryption_key_);
-
-    ESP_LOGD(TAG, "Key: %s", raw_pass.data());
 
     // auto serial = make_shared<uart::UARTComponent>(this->serial_);
 
@@ -82,6 +76,8 @@ void EM1023Component::loop() {
     // ESP_LOGI(TAG, "Meter firmware: %s", ofw.str().c_str());
     // ESP_LOGI(TAG, "Meter hardware: %s", ohw.str().c_str());
     // ESP_LOGI(TAG, "Meter serial: %s", meter_serial.c_str());
+
+    delete identification;
 
     ESP_LOGI(TAG, "update() done");
   }

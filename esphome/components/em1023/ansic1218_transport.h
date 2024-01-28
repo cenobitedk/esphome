@@ -39,6 +39,8 @@
 #include "esphome/core/log.h"
 #include "esphome/components/uart/uart.h"
 
+using namespace esphome;
+
 #ifndef CONFIG_ANSI_TRANSPORT_MUTEX_BLOCKTIME
 #define CONFIG_ANSI_TRANSPORT_MUTEX_BLOCKTIME 1000
 #endif
@@ -47,9 +49,8 @@ namespace ansic1218 {
 class Transport {
   struct Packet;
 
+  uart::UARTDevice *uart_;
   // std::shared_ptr<esphome::uart::UARTDevice> serial;
-  // esphome::uart::UARTDevice *serial;
-  esphome::uart::UARTDevice serial;
 
   SemaphoreHandle_t transport_mutex;
 
@@ -81,8 +82,7 @@ class Transport {
   static constexpr uint8_t ACK = 0x06;
   static constexpr uint8_t NACK = 0x15;
 
-  // explicit Transport(esphome::uart::UARTDevice *serial);
-  explicit Transport(esphome::uart::UARTComponent *uart_ptr);
+  explicit Transport(uart::UARTDevice *uart);
 
   bool request(service::Service &&service);
 

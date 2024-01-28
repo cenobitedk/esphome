@@ -41,9 +41,8 @@ struct Transport::Packet {
 } __attribute__((__packed__));
 
 // Transport::Transport(uart::UARTDevice *serial) : serial(move(serial)) {
-Transport::Transport(uart::UARTComponent *uart_ptr) {
-  // Prepare serial.
-  esphome::uart::UARTDevice serial(uart_ptr);
+Transport::Transport(uart::UARTDevice *uart) {
+  uart_ = uart;
 
   transport_mutex = xSemaphoreCreateMutex();
   if (!transport_mutex)
@@ -68,8 +67,7 @@ bool Transport::request(service::Service &service) {
 
   ESP_LOGD(TAG, "Send {ACK}");
 
-  vector<uint8_t> data{ACK};
-  send(data);
+  send({ACK});
 
   ESP_LOGD(TAG, "Assertion");
 
@@ -180,7 +178,7 @@ bool Transport::request(service::Service &service) {
 }
 
 void Transport::send(const vector<uint8_t> data) {
-  serial.write_array(data);
+  uart_->write_array(data);
   ESP_LOGD(TAG, "send(): %s .", bufToStr(data.cbegin(), data.cend()).c_str());
 }
 
@@ -217,7 +215,7 @@ int Transport::serialRead(vector<uint8_t> &buffer, size_t size) {
   // convert buffer vector to array
   uint8_t *buffer_array = &buffer[0];
   // read to array
-  serial.read_array(buffer_array, size);
+  uart_->read_array(buffer_array, size);
   // get length
   // auto nBytesRead = (sizeof(buffer_array) / sizeof(*buffer_array));
   auto nBytesRead = sizeof(buffer_array);
