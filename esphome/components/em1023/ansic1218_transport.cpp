@@ -213,15 +213,17 @@ int Transport::receive(vector<uint8_t> &buffer, size_t size) {
 
 int Transport::serialRead(vector<uint8_t> &buffer, size_t size) {
   // convert buffer vector to array
-  uint8_t *buffer_array = &buffer[0];
+  uint8_t buffer_array[size];
+  copy(buffer.begin(), buffer.end(), buffer_array);
+
   // read to array
   uart_->read_array(buffer_array, size);
-  // get length
-  // auto nBytesRead = (sizeof(buffer_array) / sizeof(*buffer_array));
-  auto nBytesRead = sizeof(buffer_array);
+
+  // get length of bytes read
+  auto nBytesRead = (sizeof(buffer_array) / sizeof(*buffer_array));
 
   // insert into vector buffer
-  buffer.insert(buffer.begin(), buffer_array, buffer_array + nBytesRead);
+  buffer.insert(buffer.end(), buffer_array, buffer_array + nBytesRead);
 
   return nBytesRead;
 }
