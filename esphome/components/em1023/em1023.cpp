@@ -17,13 +17,7 @@ namespace em1023 {
 
 static const char *const TAG = "em1023";
 
-void EM1023Component::setup() {
-  // auto serial = make_shared<uart::UARTComponent>(this->serial_);
-
-  // Transport transport_(this);
-
-  Transport *transport_ = new Transport(this);
-}
+void EM1023Component::setup() { transport_ = new Transport(this); }
 
 void EM1023Component::update() { this->trigger_update_ = true; }
 
@@ -48,14 +42,14 @@ void EM1023Component::loop() {
     // Identification *identification();
     Identification *identification = new Identification();
 
-    if (!this->transport_.request(*identification)) {
+    if (!transport_->request(*identification)) {
       ESP_LOGE(TAG, "Could not request identity service");
       return;
     }
 
     // identity = identification.getDeviceIdentity();
 
-    // if (!transport.request(Security(identity, raw_pass))) {
+    // if (!transport_->request(Security(identity, raw_pass))) {
     //   ESP_LOGE(TAG, "could not request security service");
     //   return;
     // }

@@ -23,7 +23,7 @@ class EM1023Component : public PollingComponent, public uart::UARTDevice {
  private:
   char const *decryption_key_;
   vector<uint8_t> HexToBytes(const char *hex_string);
-  Transport transport_{nullptr};
+  Transport *transport_{nullptr};
 
  protected:
   bool trigger_update_;
