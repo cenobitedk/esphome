@@ -235,6 +235,12 @@ void Transport::flush() {
     // ESP_LOG_BUFFER_HEX_LEVEL(TAG, buffer.data(), buffer.size(), ESP_LOG_DEBUG);
     buffer.clear();
   }
+  // for (vector<uint8_t> buffer; 0 < serialRead(buffer, 100);) {
+  //   ESP_LOGD(TAG, "Flushed:  %s", bufToStr(buffer.cbegin(), buffer.cend()).c_str());
+  //   // ESP_LOG_BUFFER_HEX_LEVEL(TAG, buffer.data(), buffer.size(), ESP_LOG_DEBUG);
+  //   buffer.clear();
+  // }
+  uart_->flush();
 }
 
 bool Transport::nack(const vector<uint8_t> &sent, const vector<uint8_t> &received) {
