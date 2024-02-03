@@ -72,7 +72,7 @@ class Transport {
     std::ostringstream ss;
     using List = int[];
     (void) List{0, ((void) (ss << args), 0)...};
-    // ESP_LOGI("ansic1218::transport", "%s %s", service.name().c_str(), ss.str().c_str());
+    ESP_LOGI("ansic1218::transport", "%s %s", service.name().c_str(), ss.str().c_str());
     return nack(sent, received);
   };
 

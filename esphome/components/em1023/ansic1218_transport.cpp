@@ -27,10 +27,10 @@ using namespace esphome;
 using namespace ansic1218;
 using namespace service;
 
-static const char *TAG = "ansic1218::transport";
+const static char *TAG = "ansic1218::transport";
 
 struct Transport::Packet {
-  enum { START_OF_PACKET = 0xee, IDENTITY = 0x05 };
+  enum { START_OF_PACKET = 0xee, IDENTITY = 0x00 };
 
   uint8_t stp;
   uint8_t identity;
@@ -58,41 +58,41 @@ bool Transport::request(service::Service &service) {
     return false;
   }
 
-  ESP_LOGD(TAG, "Creating packet");
+  ESP_LOGD(TAG, "Creating outbound packet");
 
   Packet packet{.stp = Packet::START_OF_PACKET, .identity = Packet::IDENTITY, .ctrl = 0, .seq_nbr = 0, .length = 0};
 
   const uint8_t MULTI_PACKET = 0b10000000;
   const uint8_t FIRST_PACKET = 0b01000000;
 
-  ESP_LOGD(TAG, "Send {ACK}");
+  // ESP_LOGD(TAG, "Send {ACK}");
 
-  send({ACK});
+  // send({ACK});
 
-  ESP_LOGD(TAG, "Assertion");
+  static_assert(sizeof(packet) == 6, "Packet size assertion failed");
 
-  static_assert(sizeof(packet) == 6, "");
-
+  // Cast Packet struct to generic vector and create a pointer
   auto *ptr = reinterpret_cast<uint8_t *>(&packet);
 
+  // Create new generic vector from packet
   vector<uint8_t> sent{ptr, &ptr[sizeof(packet)]};
 
-  ESP_LOGD(TAG, "Build request frame");
-
+  // Push instructions from service into vector
   if (!service.request(sent)) {
     ESP_LOGW(TAG, "Could not properly build request frame");
     xSemaphoreGive(transport_mutex);
     return false;
   }
 
+  // Cast vector back to Packet struct
   auto *p_packet = reinterpret_cast<Packet *>(sent.data());
-  p_packet->length = convert_big_endian(sent.size() - sizeof(Packet));
 
-  ESP_LOGD(TAG, "CRC calculate");
+  // Set length to different after service instructions
+  p_packet->length = convert_big_endian(static_cast<uint16_t>(sent.size() - sizeof(Packet)));
 
+  // Add CRC bytes
   CRC::calculate(sent.cbegin(), sent.cend(), sent);
 
-  ESP_LOGD(TAG, "Send request");
   send(sent);
 
   vector<uint8_t> content;
@@ -132,9 +132,9 @@ bool Transport::request(service::Service &service) {
       return ret;
     }
 
-    ESP_LOGD(TAG, "Received:");
-    ESP_LOG_BUFFER_HEX(TAG, received.data(), received.size());
-    // ESP_LOGD(TAG, "Received: %X %d", received.data(), received.size());
+    // ESP_LOGD(TAG, "Received:");
+    // ESP_LOG_BUFFER_HEX(TAG, received.data(), received.size());
+    // ESP_LOGD(TAG, "Received: %s %d", format_hex_pretty(received).c_str(), received.size());
     // ESP_LOG_BUFFER_HEX_LEVEL(TAG, received.data(), received.size(), ESP_LOG_DEBUG);
     p_packet = reinterpret_cast<Packet *>(received.data() + received.size() - sizeof(packet));
     if (!validate(p_packet)) {
@@ -202,11 +202,11 @@ int Transport::receive(vector<uint8_t> &buffer, size_t size) {
   auto nBytesRead = serialRead(buffer, size);
 
   if (nBytesRead != size) {
-    ESP_LOGD(TAG, "Receive() received less bytes than expected. expected: %d, received: %d", size, nBytesRead);
+    ESP_LOGD(TAG, "receive() received less bytes than expected. expected: %d, received: %d", size, nBytesRead);
     return false;
   }
 
-  ESP_LOGD(TAG, "received(): %s .", bufToStr(buffer.cbegin(), buffer.cend()).c_str());
+  ESP_LOGD(TAG, "receive(): %s .", bufToStr(buffer.cbegin(), buffer.cend()).c_str());
 
   return nBytesRead;
 }
@@ -230,11 +230,6 @@ int Transport::serialRead(vector<uint8_t> &buffer, size_t size) {
 
 void Transport::flush() {
   // for (vector<uint8_t> buffer; 0 < serial->read(buffer, 100, milliseconds(100));) {
-  for (vector<uint8_t> buffer; 0 < serialRead(buffer, 100);) {
-    ESP_LOGD(TAG, "Flushed:  %s", bufToStr(buffer.cbegin(), buffer.cend()).c_str());
-    // ESP_LOG_BUFFER_HEX_LEVEL(TAG, buffer.data(), buffer.size(), ESP_LOG_DEBUG);
-    buffer.clear();
-  }
   // for (vector<uint8_t> buffer; 0 < serialRead(buffer, 100);) {
   //   ESP_LOGD(TAG, "Flushed:  %s", bufToStr(buffer.cbegin(), buffer.cend()).c_str());
   //   // ESP_LOG_BUFFER_HEX_LEVEL(TAG, buffer.data(), buffer.size(), ESP_LOG_DEBUG);
@@ -244,6 +239,7 @@ void Transport::flush() {
 }
 
 bool Transport::nack(const vector<uint8_t> &sent, const vector<uint8_t> &received) {
+  ESP_LOGD(TAG, "nack():");
   ESP_LOGD(TAG, "Sent:     %s", bufToStr(sent.cbegin(), sent.cend()).c_str());
   ESP_LOGD(TAG, "Received: %s", bufToStr(received.cbegin(), received.cend()).c_str());
 

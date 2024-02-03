@@ -35,11 +35,6 @@ void EM1023Component::loop() {
 
     // vector<uint8_t> identity{};
 
-    // auto serial = make_shared<uart::UARTComponent>(this->serial_);
-
-    // Transport transport(this->serial_);
-
-    // Identification *identification();
     Identification *identification = new Identification();
 
     if (!transport_->request(*identification)) {
