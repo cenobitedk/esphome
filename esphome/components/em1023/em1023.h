@@ -4,6 +4,12 @@
 #include "esphome/components/uart/uart.h"
 
 #include "ansic1218_transport.h"
+#include "ansic1218_identification.h"
+#include "ansic1218_logon.h"
+#include "ansic1218_logoff.h"
+#include "ansic1218_security.h"
+#include "ansic1218_read-full.h"
+#include "ansic1218_table-01.h"
 
 using namespace std;
 using namespace ansic1218;

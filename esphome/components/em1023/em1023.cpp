@@ -2,11 +2,7 @@
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"
 
-#include "ansic1218_transport.h"
-#include "ansic1218_identification.h"
-#include "ansic1218_security.h"
-#include "ansic1218_read-full.h"
-#include "ansic1218_table-01.h"
+#include "em1023.h"
 
 using namespace ansic1218;
 using namespace ansic1218::service;
