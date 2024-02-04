@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include "esphome/core/log.h"
 #include "ansic1218_service.h"
 
 namespace ansic1218 {
@@ -26,9 +27,11 @@ class Security : public Service {
   static constexpr uint8_t SECURITY = 0x51;
   static constexpr unsigned int IDENTITY_LAST_N_BYTES = 0x20;
   static constexpr unsigned int SECURITY_PASSWORD_SIZE = 0x14;
+  static constexpr unsigned int SECURITY_KEY_SIZE = 0x0a;
 
  public:
-  Security(const std::vector<uint8_t> &identity, const std::vector<uint8_t> &password);
+  // Security(const std::vector<uint8_t> &identity, const std::vector<uint8_t> &password);
+  Security(const std::vector<uint8_t> &password);
 
   bool request(std::vector<uint8_t> &buffer) override;
 
