@@ -27,8 +27,7 @@ class EM1023Component : public PollingComponent, public uart::UARTDevice {
   void set_decryption_key(const std::string &decryption_key);
 
  private:
-  char const *decryption_key_;
-  vector<uint8_t> HexToBytes(const char *hex_string);
+  std::vector<uint8_t> decryption_key_;
   Transport *transport_{nullptr};
 
  protected:

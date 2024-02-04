@@ -82,43 +82,17 @@ void EM1023Component::dump_config() {
 float EM1023Component::get_setup_priority() const { return setup_priority::LATE; }
 
 void EM1023Component::set_decryption_key(const std::string &decryption_key) {
-  if (decryption_key.length() == 0) {
-    ESP_LOGI(TAG, "Disabling decryption");
-    this->decryption_key_ = nullptr;
-    // this->decryption_key_.clear();
-    if (this->decryption_key_ != nullptr) {
-      delete[] this->decryption_key_;
-      this->decryption_key_ = nullptr;
-    }
+  if (decryption_key.length() != 20) {
+    ESP_LOGE(TAG, "Error, decryption key must be 20 character long");
     return;
   }
 
-  // if (decryption_key.length() != 32) {
-  //   ESP_LOGE(TAG, "Error, decryption key must be 32 character long");
-  //   return;
-  // }
+  this->decryption_key_.clear();
 
-  this->decryption_key_ = nullptr;
-  // this->password_.clear();
-
-  ESP_LOGI(TAG, "Decryption key is set");
   // Verbose level prints decryption key
   ESP_LOGD(TAG, "Using decryption key: %s", decryption_key.c_str());
 
-  this->decryption_key_ = decryption_key.c_str();
-}
-
-vector<uint8_t> EM1023Component::HexToBytes(const char *hex_string) {
-  string hex(hex_string);
-  vector<uint8_t> bytes;
-
-  for (unsigned int i = 0; i < hex.length(); i += 2) {
-    std::string byteString = hex.substr(i, 2);
-    char byte = (char) strtol(byteString.c_str(), NULL, 16);
-    bytes.push_back(byte);
-  }
-
-  return bytes;
+  parse_hex(decryption_key, this->decryption_key_, decryption_key.length() / 2);
 }
 
 }  // namespace em1023
