@@ -11,8 +11,8 @@ bool UARTComponent::check_read_timeout_(size_t len) {
 
   uint32_t start_time = millis();
   while (this->available() < int(len)) {
-    if (millis() - start_time > 100) {
-      ESP_LOGE(TAG, "Reading from UART timed out at byte %u!", this->available());
+    if (millis() - start_time > 2000) {
+      ESP_LOGE(TAG, "Reading from UART timed (2000ms) out at byte %u!", this->available());
       return false;
     }
     yield();
