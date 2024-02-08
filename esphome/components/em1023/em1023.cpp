@@ -22,47 +22,61 @@ void EM1023Component::loop() {
     ESP_LOGI(TAG, "update() start");
     this->trigger_update_ = false;
 
-    // uint32_t result;
-    // if (this->read_sensor_(&result)) {
-    //   int32_t value = static_cast<int32_t>(result);
-    //   ESP_LOGD(TAG, "'%s': Got value %d", this->name_.c_str(), value);
-    //   this->publish_state(value);
-    // }
-
     // vector<uint8_t> identity{};
 
-    Identification *identification = new Identification();
+    // Identification *identification = new Identification();
 
-    if (!transport_->request(*identification)) {
+    if (!transport_->request(Identification())) {
       ESP_LOGE(TAG, "Could not request identity service");
-      return;
+      goto logoff;
+      // return;
+    } else {
+      ESP_LOGI(TAG, "Identity service request completed");
     }
 
-    // identity = identification.getDeviceIdentity();
+    // identity = identification->getDeviceIdentity();
 
-    // if (!transport_->request(Security(identity, raw_pass))) {
-    //   ESP_LOGE(TAG, "could not request security service");
-    //   return;
+    // delete identification;
+
+    // if (!transport_->request(Logon({0x00, 0x00}, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}))) {
+    if (!transport_->request(Logon({0x11, 0x11}, {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09}))) {
+      ESP_LOGE(TAG, "Could not request logon service");
+      // return;
+      goto logoff;
+    }
+
+    // ESP_LOGD(TAG, "Decryption key: %s", format_hex_pretty(this->decryption_key_).c_str());
+
+    if (!transport_->request(Security(this->decryption_key_))) {
+      ESP_LOGE(TAG, "could not request security service");
+      // return;
+      goto logoff;
+    }
+
+    // Table01 *table01 = new Table01();
+
+    // if (!transport_->request(ReadFull(*table01))) {
+    //   ESP_LOGE(TAG, "could not request Table01 service");
+    //   // return;
+    //   goto logoff;
+    // } else {
+    //   auto info_01 = table01->content();
+    //   string meter_serial(info_01->mfg_serial_number, sizeof(info_01->mfg_serial_number));
+    //   ostringstream ofw;
+    //   ostringstream ohw;
+
+    //   ofw << (int) info_01->fw_version_number << "." << (int) info_01->fw_revision_number;
+    //   ohw << (int) info_01->hw_version_number << "." << (int) info_01->hw_revision_number;
+
+    //   ESP_LOGI(TAG, "Meter firmware: %s", ofw.str().c_str());
+    //   ESP_LOGI(TAG, "Meter hardware: %s", ohw.str().c_str());
+    //   ESP_LOGI(TAG, "Meter serial: %s", meter_serial.c_str());
     // }
 
-    // Table01 table01;
-
-    // if (!transport.request(ReadFull(table01)))
-    //   return;
-
-    // auto info_01 = table01.content();
-    // string meter_serial(info_01->mfg_serial_number, sizeof(info_01->mfg_serial_number));
-    // ostringstream ofw;
-    // ostringstream ohw;
-
-    // ofw << (int) info_01->fw_version_number << "." << (int) info_01->fw_revision_number;
-    // ohw << (int) info_01->hw_version_number << "." << (int) info_01->hw_revision_number;
-
-    // ESP_LOGI(TAG, "Meter firmware: %s", ofw.str().c_str());
-    // ESP_LOGI(TAG, "Meter hardware: %s", ohw.str().c_str());
-    // ESP_LOGI(TAG, "Meter serial: %s", meter_serial.c_str());
-
-    delete identification;
+  logoff:
+    if (!transport_->request(Logoff())) {
+      ESP_LOGE(TAG, "Could not request logoff service");
+    }
 
     ESP_LOGI(TAG, "update() done");
   }
