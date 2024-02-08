@@ -121,7 +121,7 @@ bool Transport::request(service::Service &service) {
     return ret;
   }
 
-  ESP_LOGD(TAG, "Response received, start processing ...");
+  ESP_LOGD(TAG, "ACK received, wait for response ...");
 
   do {
     received.clear();
